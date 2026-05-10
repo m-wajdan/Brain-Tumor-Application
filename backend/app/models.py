@@ -7,6 +7,7 @@ Schema follows execution plan §4.1 – Phase 1 specification:
 from datetime import datetime, timezone
 
 from sqlalchemy import Column, Integer, String, Text, DateTime, JSON
+from sqlalchemy import SmallInteger
 
 from app.database import Base
 
@@ -35,6 +36,7 @@ class PatientRecord(Base):
     volumes_json = Column(JSON, nullable=False)
     overlay_path = Column(String(512), nullable=True)
     original_path = Column(String(512), nullable=True)
+    age = Column(SmallInteger, nullable=True)
     doctor_notes = Column(Text, nullable=True, default="")
     created_at = Column(
         DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)

@@ -40,6 +40,26 @@ function HistoryIcon({ className }) {
   );
 }
 
+function DashboardIcon({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1.5" />
+      <rect x="14" y="3" width="7" height="7" rx="1.5" />
+      <rect x="3" y="14" width="7" height="7" rx="1.5" />
+      <rect x="14" y="14" width="7" height="7" rx="1.5" />
+    </svg>
+  );
+}
+
+function SettingsIcon({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 .6 1.65 1.65 0 0 0-.4 1.1V22a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.1a1.65 1.65 0 0 0-.4-1.1 1.65 1.65 0 0 0-1-.6 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-.6-1 1.65 1.65 0 0 0-1.1-.4H2a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.1a1.65 1.65 0 0 0 1.1-.4 1.65 1.65 0 0 0 .6-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.6c.26-.15.62-.4 1-.6.34-.2.69-.4 1.1-.4H13a2 2 0 0 1 2 2v.1c0 .41.14.8.4 1.1.18.21.55.45 1 .6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.15.26.4.62.6 1 .2.34.4.69.4 1.1V13a2 2 0 0 1-2 2h-.1c-.41 0-.8.14-1.1.4-.21.18-.45.55-.6 1Z" />
+    </svg>
+  );
+}
+
 function ReportIcon({ className }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -68,22 +88,28 @@ function ChevronIcon({ className, collapsed }) {
  */
 const NAV_ITEMS = [
   {
+    id: "dashboard",
+    label: "Dashboard",
+    icon: DashboardIcon,
+    description: "Workspace overview",
+  },
+  {
     id: "assessment",
-    label: "New Assessment",
+    label: "New Diagnosis",
     icon: ScanIcon,
     description: "Run MRI analysis",
   },
   {
-    id: "patient_report",
-    label: "Report & Chat",
-    icon: ReportIcon,
-    description: "AI analysis and Q&A",
-  },
-  {
     id: "history",
-    label: "Patient History",
+    label: "History",
     icon: HistoryIcon,
     description: "View saved records",
+  },
+  {
+    id: "settings",
+    label: "Settings",
+    icon: SettingsIcon,
+    description: "Profile and preferences",
   },
 ];
 
@@ -104,16 +130,16 @@ export default function Sidebar({ activePage, onNavigate, user, onLogout, collap
     >
       {/* ── Logo ─────────────────────────────────────────────────────────── */}
       <div className="flex items-center gap-3 px-4 py-5 border-b border-border">
-        <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-accent/15 flex items-center justify-center">
-          <BrainIcon className="w-5 h-5 text-accent" />
+        <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-[#1a9d9f]/15 flex items-center justify-center">
+          <BrainIcon className="w-5 h-5 text-[#1a9d9f]" />
         </div>
         {!collapsed && (
           <div className="overflow-hidden">
-            <h1 className="text-base font-semibold gradient-text tracking-tight">
-              NOTES
+            <h1 className="text-base font-semibold text-foreground tracking-tight">
+              NeuroScan
             </h1>
             <p className="text-[10px] text-muted leading-tight truncate">
-              Neuro-Oncology Tracking
+              Workspace
             </p>
           </div>
         )}
@@ -135,19 +161,19 @@ export default function Sidebar({ activePage, onNavigate, user, onLogout, collap
                 transition-all duration-200 group relative
                 ${
                   isActive
-                    ? "bg-sidebar-active text-accent shadow-sm shadow-accent/5"
-                    : "text-muted hover:text-foreground hover:bg-sidebar-hover"
+                      ? "bg-[#1a9d9f]/10 text-[#1a9d9f] shadow-sm"
+                      : "text-muted hover:text-foreground hover:bg-sidebar-hover"
                 }
               `}
             >
               {/* Active indicator bar */}
               {isActive && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-accent" />
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-[#1a9d9f]" />
               )}
 
               <Icon
                 className={`w-[18px] h-[18px] flex-shrink-0 transition-colors ${
-                  isActive ? "text-accent" : "text-muted group-hover:text-foreground"
+                  isActive ? "text-[#1a9d9f]" : "text-gray-600 group-hover:text-gray-900"
                 }`}
               />
 
@@ -169,8 +195,8 @@ export default function Sidebar({ activePage, onNavigate, user, onLogout, collap
       {/* ── User Profile & Collapse ─────────────────────────────────────── */}
       <div className="px-3 py-3 border-t border-border space-y-2">
         {user && !collapsed && (
-          <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-white/5 border border-white/5 mb-2">
-            <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent font-bold text-xs uppercase">
+          <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-surface border border-border mb-2">
+            <div className="w-8 h-8 rounded-full bg-[#1a9d9f]/20 flex items-center justify-center text-[#1a9d9f] font-bold text-xs uppercase">
               {user.email[0]}
             </div>
             <div className="overflow-hidden">
@@ -179,7 +205,7 @@ export default function Sidebar({ activePage, onNavigate, user, onLogout, collap
             </div>
             <button 
               onClick={onLogout}
-              className="ml-auto p-1.5 text-muted hover:text-danger hover:bg-danger/10 rounded-lg transition-colors cursor-pointer"
+              className="ml-auto p-1.5 text-muted hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
               title="Logout"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
@@ -194,7 +220,7 @@ export default function Sidebar({ activePage, onNavigate, user, onLogout, collap
                      text-xs transition-colors cursor-pointer"
         >
           <ChevronIcon className="w-4 h-4" collapsed={collapsed} />
-          {!collapsed && <span>Collapse Sidebar</span>}
+          {!collapsed && <span>Collapse</span>}
         </button>
 
         {user && collapsed && (

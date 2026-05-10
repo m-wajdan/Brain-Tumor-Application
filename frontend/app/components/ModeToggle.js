@@ -5,7 +5,7 @@
  */
 export default function ModeToggle({ mode, onModeChange }) {
   return (
-    <div className="flex items-center gap-1 rounded-lg bg-surface border border-border p-1">
+    <div className="flex items-center gap-1 rounded-lg bg-white border border-gray-300 p-1">
       <button
         id="mode-a-btn"
         onClick={() => onModeChange("a")}
@@ -14,8 +14,8 @@ export default function ModeToggle({ mode, onModeChange }) {
           transition-all duration-200 cursor-pointer
           ${
             mode === "a"
-              ? "bg-accent text-white shadow-sm shadow-accent/25"
-              : "text-muted hover:text-foreground hover:bg-surface-hover"
+              ? "bg-[#1a9d9f] text-white shadow-sm shadow-[#1a9d9f]/25"
+              : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
           }
         `}
       >
@@ -32,8 +32,8 @@ export default function ModeToggle({ mode, onModeChange }) {
           transition-all duration-200 cursor-pointer
           ${
             mode === "b"
-              ? "bg-warning text-white shadow-sm shadow-warning/25"
-              : "text-muted hover:text-foreground hover:bg-surface-hover"
+              ? "bg-orange-400 text-white shadow-sm shadow-orange-400/25"
+              : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
           }
         `}
       >

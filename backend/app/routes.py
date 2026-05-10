@@ -35,6 +35,7 @@ from app.crud import (
     get_records,
     update_record,
     get_user_by_email,
+    update_user_password,
 )
 from app.database import get_db
 from app.schemas import (
@@ -47,6 +48,7 @@ from app.schemas import (
     GenerateReportRequest,
     ChatRequest,
     LLMResponse,
+    PasswordChangeRequest,
     UserAuth,
     UserOut,
     UserCreate,
@@ -94,6 +96,31 @@ def signup(data: UserCreate, db: Session = Depends(get_db)):
     
     from app.crud import create_user
     return create_user(db, data)
+
+
+@router.post("/api/auth/change-password", response_model=UserOut)
+def change_password(data: PasswordChangeRequest, db: Session = Depends(get_db)):
+    """Change an existing user's password after validating the current password."""
+    if data.new_password != data.confirm_new_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New password and confirmation do not match.",
+        )
+
+    user = get_user_by_email(db, data.email)
+    if not user or user.password != data.current_password:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Current password is incorrect.",
+        )
+
+    updated = update_user_password(db, data.email, data.new_password)
+    if updated is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found.",
+        )
+    return updated
 
 # The analyzer is injected via dependency (set in main.py at startup)
 _analyzer = None
@@ -202,6 +229,7 @@ async def analyze_scan(
 
         return AnalyzeResponse(
             volumes=VolumeResult(**result["volumes"]),
+            confidence_score=result["confidence_score"],
             overlay_url=result["overlay_url"],
             original_url=result.get("original_url"),
             slice_index=result["slice_index"],

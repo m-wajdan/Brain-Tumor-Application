@@ -23,21 +23,40 @@
 }
 
 :root {
-  --background: #0b0f1a;
-  --foreground: #e4e8f1;
-  --surface: #111827;
-  --surface-hover: #1a2235;
-  --border-color: #1e293b;
-  --accent: #6366f1;
-  --accent-hover: #818cf8;
-  --accent-subtle: rgba(99, 102, 241, 0.12);
+  --background: #ffffff;
+  --foreground: #111827;
+  --surface: #f9fafb;
+  --surface-hover: #f3f4f6;
+  --border-color: #e5e7eb;
+  --accent: #1a9d9f;
+  --accent-hover: #158a8c;
+  --accent-subtle: rgba(26, 157, 159, 0.08);
   --danger: #ef4444;
-  --success: #22c55e;
+  --success: #10b981;
   --warning: #f59e0b;
-  --muted: #64748b;
-  --sidebar-bg: #070b14;
-  --sidebar-item-hover: rgba(99, 102, 241, 0.08);
-  --sidebar-item-active: rgba(99, 102, 241, 0.15);
+  --muted: #6b7280;
+  --sidebar-bg: #ffffff;
+  --sidebar-item-hover: rgba(26, 157, 159, 0.08);
+  --sidebar-item-active: rgba(26, 157, 159, 0.15);
+}
+
+html[data-theme="dark"] {
+  --background: #0f172a;
+  --foreground: #e5e7eb;
+  --surface: #111827;
+  --surface-hover: #1f2937;
+  --border-color: #334155;
+  --accent: #3bc6c8;
+  --accent-hover: #24b2b5;
+  --accent-subtle: rgba(59, 198, 200, 0.14);
+  --danger: #f87171;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --muted: #94a3b8;
+  --sidebar-bg: #0b1220;
+  --sidebar-item-hover: rgba(59, 198, 200, 0.12);
+  --sidebar-item-active: rgba(59, 198, 200, 0.18);
+  color-scheme: dark;
 }
 
 /* ── Scrollbar ─────────────────────────────────────────────────────────── */
@@ -62,6 +81,45 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+}
+
+/* Accessibility: ensure high contrast on white/light surfaces */
+html:not([data-theme="dark"]) .bg-white,
+html:not([data-theme="dark"]) .white-background,
+html:not([data-theme="dark"]) .card,
+html:not([data-theme="dark"]) .panel,
+html:not([data-theme="dark"]) .surface,
+html:not([data-theme="dark"]) input,
+html:not([data-theme="dark"]) textarea,
+html:not([data-theme="dark"]) select {
+  color: #000 !important;
+}
+
+/* Ensure form controls in light theme show black text for readability */
+html:not([data-theme="dark"]) input::placeholder,
+html:not([data-theme="dark"]) textarea::placeholder {
+  color: rgba(0,0,0,0.35) !important;
+}
+
+/* Accessibility: force black text on white boxes even in dark theme
+   Some UI elements intentionally use white/light surfaces (cards,
+   info panels, inputs). Ensure their text remains readable by forcing
+   black foreground when the element background is light. */
+html[data-theme="dark"] .bg-white,
+html[data-theme="dark"] .white-background,
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .panel,
+html[data-theme="dark"] .surface,
+html[data-theme="dark"] input,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select {
+  color: #000 !important;
+  background-color: #fff !important;
+}
+
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+  color: rgba(0,0,0,0.35) !important;
 }
 
 /* ── Smooth transitions for interactive elements ──────────────────────── */

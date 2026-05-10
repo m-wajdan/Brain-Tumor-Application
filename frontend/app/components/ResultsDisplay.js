@@ -57,12 +57,12 @@ export default function ResultsDisplay({ result, onSave, saving, mode = "a" }) {
             onClick={onSave}
             disabled={saving}
             className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold
-                       bg-success/15 text-success border border-success/25
-                       hover:bg-success/25 hover:border-success/40
+                       bg-[#1a9d9f]/15 text-[#1a9d9f] border border-[#1a9d9f]/25
+                       hover:bg-[#1a9d9f]/25 hover:border-[#1a9d9f]/40
                        disabled:opacity-50 transition-all cursor-pointer"
           >
             {saving ? (
-              <span className="w-3.5 h-3.5 border-2 border-success/30 border-t-success rounded-full animate-spin" />
+              <span className="w-3.5 h-3.5 border-2 border-[#1a9d9f]/30 border-t-[#1a9d9f] rounded-full animate-spin" />
             ) : (
               <SaveIcon className="w-3.5 h-3.5" />
             )}
@@ -135,7 +135,7 @@ export default function ResultsDisplay({ result, onSave, saving, mode = "a" }) {
               <VolumeBar
                 label="Tumor Core (TC)"
                 value={volumes.tc_volume_cm3}
-                color="#6366f1"
+                color="#3b82f6"
                 maxValue={maxVol}
               />
             </div>
@@ -153,8 +153,8 @@ export default function ResultsDisplay({ result, onSave, saving, mode = "a" }) {
           <div className="grid grid-cols-3 gap-4 pt-4 border-t border-border">
             {[
               { label: "WT", val: volumes.wt_volume_cm3, color: "#ef4444" },
-              { label: "TC", val: volumes.tc_volume_cm3, color: "#6366f1" },
-              { label: "ET", val: volumes.et_volume_cm3, color: "#22c55e" },
+              { label: "TC", val: volumes.tc_volume_cm3, color: "#3b82f6" },
+              { label: "ET", val: volumes.et_volume_cm3, color: "#10b981" },
             ].map((item) => (
               <div
                 key={item.label}

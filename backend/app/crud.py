@@ -17,6 +17,7 @@ def create_record(db: Session, data: PatientRecordCreate) -> PatientRecord:
         scan_type=data.scan_type,
         volumes_json=data.volumes_json,
         overlay_path=data.overlay_path,
+        age=data.age,
         original_path=data.original_path,
         doctor_notes=data.doctor_notes,
     )
@@ -87,6 +88,18 @@ def create_user(db: Session, data: UserCreate) -> User:
         role=data.role,
     )
     db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def update_user_password(db: Session, email: str, new_password: str) -> Optional[User]:
+    """Update a user's password by email."""
+    user = get_user_by_email(db, email)
+    if user is None:
+        return None
+
+    user.password = new_password
     db.commit()
     db.refresh(user)
     return user

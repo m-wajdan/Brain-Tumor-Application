@@ -25,6 +25,7 @@ class AnalyzeResponse(BaseModel):
     """Full response from the /api/analyze endpoint."""
 
     volumes: VolumeResult
+    confidence_score: float = Field(..., description="Model confidence score in percent")
     overlay_url: str = Field(..., description="URL to the overlay image")
     original_url: Optional[str] = Field(None, description="URL to the original image slice")
     slice_index: int = Field(..., description="Axial slice index used for overlay")
@@ -52,6 +53,7 @@ class PatientRecordCreate(BaseModel):
     patient_name: str = "Unnamed Patient"
     scan_type: str = "mode_a"
     volumes_json: Dict[str, Any]
+    age: Optional[int] = None
     overlay_path: Optional[str] = None
     original_path: Optional[str] = None
     doctor_notes: str = ""
@@ -71,6 +73,7 @@ class PatientRecordOut(BaseModel):
     patient_name: str
     scan_type: str
     volumes_json: Dict[str, Any]
+    age: Optional[int]
     overlay_path: Optional[str]
     original_path: Optional[str]
     doctor_notes: Optional[str]
@@ -109,6 +112,15 @@ class UserAuth(BaseModel):
 class UserCreate(UserAuth):
     """Schema for creating a new user."""
     role: str = "doctor"
+
+
+class PasswordChangeRequest(BaseModel):
+    """Schema for updating an existing user's password."""
+
+    email: str
+    current_password: str
+    new_password: str
+    confirm_new_password: str
 
 
 class UserOut(BaseModel):

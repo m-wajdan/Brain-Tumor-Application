@@ -10,6 +10,7 @@ import logging
 import sys
 from contextlib import asynccontextmanager
 
+from sqlalchemy import text
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -26,6 +27,16 @@ logging.basicConfig(
 )
 logger = logging.getLogger("notes")
 
+def ensure_patient_records_age_column() -> None:
+    """Add the age column to older SQLite databases if it is missing."""
+    with engine.begin() as conn:
+        columns = conn.exec_driver_sql("PRAGMA table_info(patient_records)").fetchall()
+        column_names = {row[1] for row in columns}
+
+        if "age" not in column_names:
+            logger.info("Adding missing patient_records.age column to existing database")
+            conn.execute(text("ALTER TABLE patient_records ADD COLUMN age INTEGER"))
+
 
 # ── Lifespan ─────────────────────────────────────────────────────────────────
 
@@ -39,6 +50,7 @@ async def lifespan(app: FastAPI):
     # ── Startup ──
     logger.info("Creating database tables ...")
     Base.metadata.create_all(bind=engine)
+    ensure_patient_records_age_column()
 
     # Seed default user if none exists
     from app.database import get_db

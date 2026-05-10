@@ -222,7 +222,7 @@ class BrainTumorAnalyzer:
 
     def run_inference(
         self, img_array: np.ndarray
-    ) -> tuple[np.ndarray, tuple[int, int, int]]:
+    ) -> tuple[np.ndarray, tuple[int, int, int], float]:
         """
         Run HybridDANet inference on a centre crop.
 
@@ -248,6 +248,9 @@ class BrainTumorAnalyzer:
             pred = self.model(img_tensor)
             pred_sigmoid = torch.sigmoid(pred).cpu().numpy()[0]  # (3, D, H, W)
 
+        # Derive a model confidence score from the voxel-wise maximum probability.
+        confidence_score = round(float(pred_sigmoid.max(axis=0).mean() * 100), 2)
+
         # Apply strict biological hierarchy (executionPlan §3.2)
         pred_wt = pred_sigmoid[0] > THRESHOLD_WT
         pred_tc = (pred_sigmoid[1] > THRESHOLD_TC) & pred_wt
@@ -255,7 +258,7 @@ class BrainTumorAnalyzer:
 
         pred_binary = np.stack([pred_wt, pred_tc, pred_et], axis=0)
 
-        return pred_binary, (h0, w0, d0)
+        return pred_binary, (h0, w0, d0), confidence_score
 
     # ── Volumetric Calculation ───────────────────────────────────────────
 
@@ -307,7 +310,7 @@ class BrainTumorAnalyzer:
         img_array, voxel_dims = self.load_nifti_modalities(file_paths)
 
         # 2. Infer
-        pred_binary, (h0, w0, d0) = self.run_inference(img_array)
+        pred_binary, (h0, w0, d0), confidence_score = self.run_inference(img_array)
 
         # 3. Volumes
         volumes = self.compute_volumes(pred_binary, voxel_dims)
@@ -343,6 +346,7 @@ class BrainTumorAnalyzer:
 
         return {
             "volumes": volumes,
+            "confidence_score": confidence_score,
             "overlay_filename": overlay_filename,
             "overlay_url": f"/static/overlays/{overlay_filename}",
             "original_url": f"/static/overlays/{original_filename}",

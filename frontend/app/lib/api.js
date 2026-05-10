@@ -4,6 +4,28 @@
  */
 
 const API_BASE = "http://127.0.0.1:8000";
+const LOCAL_RECORDS_KEY = "notes_local_records";
+
+function readLocalRecords() {
+  if (typeof window === "undefined") return [];
+  try {
+    return JSON.parse(window.localStorage.getItem(LOCAL_RECORDS_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function writeLocalRecords(records) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(LOCAL_RECORDS_KEY, JSON.stringify(records));
+}
+
+function cloneLocalRecord(record) {
+  return {
+    ...record,
+    id: Number(record.id),
+  };
+}
 
 // ── Generic helpers ─────────────────────────────────────────────────────────
 
@@ -52,10 +74,12 @@ export async function analyzeComparison(baselineFiles, followupFiles) {
 // ── Patient record CRUD ─────────────────────────────────────────────────────
 
 export async function fetchRecords(skip = 0, limit = 100) {
-  const res = await fetch(
-    `${API_BASE}/api/records?skip=${skip}&limit=${limit}`
-  );
-  return handleResponse(res);
+  try {
+    const res = await fetch(`${API_BASE}/api/records?skip=${skip}&limit=${limit}`);
+    return handleResponse(res);
+  } catch {
+    return readLocalRecords().slice(skip, skip + limit).map(cloneLocalRecord);
+  }
 }
 
 export async function fetchRecordById(id) {
@@ -64,26 +88,69 @@ export async function fetchRecordById(id) {
 }
 
 export async function saveRecord(data) {
-  const res = await fetch(`${API_BASE}/api/records`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  return handleResponse(res);
+  try {
+    const res = await fetch(`${API_BASE}/api/records`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    return handleResponse(res);
+  } catch {
+    const now = new Date().toISOString();
+    const records = readLocalRecords();
+    const nextId = records.reduce((max, record) => Math.max(max, Number(record.id) || 0), 0) + 1;
+    const localRecord = {
+      id: nextId,
+      patient_name: data.patient_name,
+      scan_type: data.scan_type || "mode_a",
+      volumes_json: data.volumes_json,
+      overlay_path: data.overlay_path || null,
+      original_path: data.original_path || null,
+      doctor_notes: data.doctor_notes || "",
+      age: data.age ?? null,
+      created_at: now,
+    };
+    writeLocalRecords([localRecord, ...records]);
+    return localRecord;
+  }
 }
 
 export async function updateRecord(id, data) {
-  const res = await fetch(`${API_BASE}/api/records/${id}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  return handleResponse(res);
+  try {
+    const res = await fetch(`${API_BASE}/api/records/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    return handleResponse(res);
+  } catch {
+    const records = readLocalRecords();
+    const nextRecords = records.map((record) => (
+      String(record.id) === String(id) ? { ...record, ...data } : record
+    ));
+    writeLocalRecords(nextRecords);
+    return nextRecords.find((record) => String(record.id) === String(id)) || null;
+  }
 }
 
 export async function deleteRecord(id) {
-  const res = await fetch(`${API_BASE}/api/records/${id}`, {
-    method: "DELETE",
+  try {
+    const res = await fetch(`${API_BASE}/api/records/${id}`, {
+      method: "DELETE",
+    });
+    return handleResponse(res);
+  } catch {
+    const records = readLocalRecords().filter((record) => String(record.id) !== String(id));
+    writeLocalRecords(records);
+    return null;
+  }
+}
+
+export async function changePassword(data) {
+  const res = await fetch(`${API_BASE}/api/auth/change-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
   });
   return handleResponse(res);
 }
