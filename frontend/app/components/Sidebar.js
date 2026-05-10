@@ -2,20 +2,7 @@
 
 import { useState } from "react";
 
-/*
- * ── Icon components (inline SVGs to avoid extra deps) ───────────────────────
- */
-function BrainIcon({ className }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7Z" />
-      <path d="M10 21v-1M14 21v-1" />
-      <path d="M9 10h.01M15 10h.01" />
-      <path d="M12 2v5" />
-      <path d="M8 6l1.5 2M16 6l-1.5 2" />
-    </svg>
-  );
-}
+import BrainLogo from "./BrainLogo";
 
 function ScanIcon({ className }) {
   return (
@@ -130,8 +117,8 @@ export default function Sidebar({ activePage, onNavigate, user, onLogout, collap
     >
       {/* ── Logo ─────────────────────────────────────────────────────────── */}
       <div className="flex items-center gap-3 px-4 py-5 border-b border-border">
-        <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-[#1a9d9f]/15 flex items-center justify-center">
-          <BrainIcon className="w-5 h-5 text-[#1a9d9f]" />
+          <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-[#1a9d9f]/15 flex items-center justify-center">
+          <BrainLogo className="w-5 h-5" />
         </div>
         {!collapsed && (
           <div className="overflow-hidden">

@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
+import BrainLogo from "./BrainLogo";
 
 export default function AuthPage({ onLogin }) {
   const [isLogin, setIsLogin] = useState(true);
@@ -73,13 +74,8 @@ export default function AuthPage({ onLogin }) {
         {/* Logo and Branding */}
         <div>
           <div className="flex items-center gap-3 mb-16">
-            {/* Brain Icon */}
             <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center">
-              <svg className="w-7 h-7 text-[#1a9d9f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="8" r="6" />
-                <path d="M8 14h8v6H8z" />
-                <path d="M10 20v2M14 20v2" />
-              </svg>
+              <BrainLogo className="w-8 h-8" />
             </div>
             <span className="text-white text-2xl font-bold">NeuroScan</span>
           </div>
@@ -109,11 +105,7 @@ export default function AuthPage({ onLogin }) {
           {/* Logo for mobile */}
           <div className="lg:hidden flex items-center gap-2 mb-8">
             <div className="w-10 h-10 bg-[#1a9d9f] rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="8" r="6" />
-                <path d="M8 14h8v6H8z" />
-                <path d="M10 20v2M14 20v2" />
-              </svg>
+              <BrainLogo className="w-6 h-6" />
             </div>
             <span className="text-2xl font-bold text-gray-900">NeuroScan</span>
           </div>
