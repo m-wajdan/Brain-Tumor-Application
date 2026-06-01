@@ -57,6 +57,8 @@ def update_record(
         record.patient_name = data.patient_name
     if data.doctor_notes is not None:
         record.doctor_notes = data.doctor_notes
+    if data.age is not None:
+        record.age = data.age
 
     db.commit()
     db.refresh(record)

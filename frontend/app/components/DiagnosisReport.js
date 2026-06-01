@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { overlayUrl, saveRecord } from "../lib/api";
+import { overlayUrl, saveRecord, updateRecord } from "../lib/api";
 
 function TypewriterText({ text, speed = 12, onComplete }) {
   const [displayed, setDisplayed] = useState("");
@@ -149,9 +149,9 @@ export default function DiagnosisReport({ result, patientInfo, onBack }) {
   const [chatHistory, setChatHistory] = useState([]);
   const [chatInput, setChatInput] = useState("");
   const [sendingChat, setSendingChat] = useState(false);
-  const [saveName, setSaveName] = useState(patientInfo?.name || "");
+  const [saveName, setSaveName] = useState(patientInfo?.name || patientInfo?.id || "");
   const [saveAge, setSaveAge] = useState(patientInfo?.age || "");
-  const [saveNotes, setSaveNotes] = useState("");
+  const [saveNotes, setSaveNotes] = useState(patientInfo?.notes || "");
   const [saving, setSaving] = useState(false);
   const [sessionId] = useState(() => Math.random().toString(36).slice(2, 9));
 
@@ -167,12 +167,18 @@ export default function DiagnosisReport({ result, patientInfo, onBack }) {
   const quickPrompts = useMemo(
     () => [
       "Explain the findings in simple terms",
-      "What does No tumor mean?",
+      "What do these results mean?",
       "What are typical next steps?",
       "Is the confidence reliable?",
     ],
     []
   );
+
+  useEffect(() => {
+    setSaveName(patientInfo?.name || patientInfo?.id || "");
+    setSaveAge(patientInfo?.age || "");
+    setSaveNotes(patientInfo?.notes || "");
+  }, [patientInfo?.name, patientInfo?.id, patientInfo?.age, patientInfo?.notes, result?.id]);
 
   useEffect(() => {
     let active = true;
@@ -308,12 +314,9 @@ export default function DiagnosisReport({ result, patientInfo, onBack }) {
             <div className="flex justify-between items-start gap-4">
                 <div>
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Patient</p>
-                  <h2 className="text-2xl font-bold text-gray-900">{patientInfo?.id || patientLabel}</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">{patientInfo?.name || patientInfo?.id || patientLabel}</h2>
                   <p className="text-sm text-gray-600 mt-1">{new Date().toLocaleString()}</p>
                 </div>
-                <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full whitespace-nowrap">
-                  No tumor
-                </span>
               </div>
 
               <div className="mt-5">
@@ -347,9 +350,18 @@ export default function DiagnosisReport({ result, patientInfo, onBack }) {
                           doctor_notes: saveNotes || "",
                           age: saveAge ? Number(saveAge) : null,
                         };
-                        const saved = await saveRecord(payload);
+                        const saved = result?.id
+                          ? await updateRecord(result.id, {
+                              patient_name: payload.patient_name,
+                              doctor_notes: payload.doctor_notes,
+                              age: payload.age,
+                            })
+                          : await saveRecord(payload);
+
                         setSaveName(saved?.patient_name || payload.patient_name);
-                        alert(saved?.id ? "Saved to history" : "Saved locally to history");
+                        setSaveAge(saved?.age ?? payload.age ?? "");
+                        setSaveNotes(saved?.doctor_notes || payload.doctor_notes || "");
+                        alert(saved?.id ? (result?.id ? "Record updated in history" : "Saved to history") : "Saved locally to history");
                       } catch (err) {
                         alert("Saving failed: " + (err.message || err));
                       } finally {
@@ -358,7 +370,7 @@ export default function DiagnosisReport({ result, patientInfo, onBack }) {
                     }}
                     className="px-4 py-2 rounded-lg bg-[#1a9d9f] text-white text-sm font-medium hover:bg-[#158a8c]"
                   >
-                    {saving ? "Saving..." : "Save to History"}
+                    {saving ? "Saving..." : result?.id ? "Update History" : "Save to History"}
                   </button>
                 </div>
                 <div className="mt-3">

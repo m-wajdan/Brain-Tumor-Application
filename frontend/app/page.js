@@ -162,6 +162,7 @@ export default function Home() {
     setUploadedFiles(null);
     setPatientInfo({
       id: record.patient_name || "",
+      name: record.patient_name || "",
       age: record.age ?? "",
       notes: record.doctor_notes || "",
     });

@@ -1,0 +1,85 @@
+----------------------------------------------------------------------------------------
+LOSS FUNCTION:
+----------------------------------------------------------------------------------------
+Combined, the actual tumor makes up less than 2.4% of the entire image.
+If your model just lazily guessed "Background" for every single voxel, it would technically be 97.6% accurate, 
+but clinically useless. This extreme imbalance is the exact reason your implementation uses the Focal Tversky Loss—it 
+mathematically forces the network to stop ignoring that tiny 2.4% needle in the haystack.
+
+----------------------------------------------------------------------------------------
+DATASET:
+----------------------------------------------------------------------------------------
+For the training phase, the files look like this:
+
+..._flair.nii.gz : FLAIR (Fluid-Attenuated Inversion Recovery)
+..._t1.nii.gz : T1w (T1-Weighted)
+..._t1ce.nii.gz : T1ce (T1-Weighted Contrast-Enhanced)
+..._t2.nii.gz : T2w (T2-Weighted)
+..._seg.nii.gz (Only present in the training set) : SEG (The Segmentation Mask)
+
+FLAIR (Fluid-Attenuated Inversion Recovery): The water molecules in the cerebrospinal fluid are mathematically darkened
+in this scan. Because the fluid is dark, the Edema (which is essentially abnormal swelling/fluid in the tissue) 
+glows bright white. This file is the primary way the network learns the outer boundaries of the Whole Tumor (WT).
+
+T1w (T1-Weighted): This is the baseline structural map. It provides the highest anatomical detail of the healthy brain,
+allowing the network to understand normal gray and white matter boundaries so it knows what isn't a tumor.
+
+T1ce (T1-Weighted Contrast-Enhanced): The patient was injected with a contrast agent before this scan. The highly 
+active, blood-thirsty parts of the tumor absorb this agent and glow incredibly bright. This file is directly 
+responsible for teaching the network how to find the Enhancing Tumor (ET).
+
+T2w (T2-Weighted): In this scan, all fluid glows bright. It helps the network delineate the Tumor Core (TC) from the 
+surrounding edema and normal ventricles.
+
+SEG (The Segmentation Mask): This is the Ground Truth. It is a manually painted 3D mask created by expert radiologists. 
+It contains integers (0 for background, 1 for NCR, 2 for Edema, 4 for ET). Your CombinedLoss function actively 
+compares the model's predictions based on the 4 input files against this exact .seg file to calculate the error and 
+update the weights.
+
+----------------------------------------------------------------------------------------
+PRE-PROCESSING
+----------------------------------------------------------------------------------------
+1: Normalisation Helpers (zscore_normalize & build_target_mask)
+Intensity Standardization: MRI machines from different hospitals output wildly different brightness levels 
+(unlike CT scans, which use a fixed scale). Z-score normalization ensures the neural network learns structural 
+patterns instead of getting confused by absolute brightness.
+
+build_target_mask: Translates the raw integer labels from the dataset (0=background, 1=NCR, 2=edema, 4=ET) into a 
+stacked 3-channel binary mask representing the clinical hierarchy: Whole Tumor (WT), Tumor Core (TC), and Enhancing 
+Tumor (ET).
+
+
+
+2:Patch Extraction Helpers (random_crop_3d & center_crop_3d)
+random_crop_3d: Cuts out a smaller 3D block (a patch) from the massive brain volume. 
+Because of the foreground_prob=0.80, 80% of the time it forces the center of this crop to be directly on top 
+of a tumor voxel. The other 20% of the time, it crops randomly.
+
+center_crop_3d: Always crops the exact physical center of the brain volume for validation.
+
+
+
+3: Augmentation Helpers (augment_3d)
+This prevents the overfitting in the training by constantly fliipping and altering the brightness of the scans.
+
+
+
+4:The PyTorch Dataset (BraTS2020Dataset)
+PyTorch requires a standardized Dataset object to pull data from your hard drive into RAM. 
+This class orchestrates all the helper functions above into an automated, seamless assembly line.
+
+
+
+5: The DataLoaders (build_dataloaders)
+While the Dataset class grabs a single patient, the DataLoader manages Batching (grouping multiple patients together 
+to feed the GPU), Shuffling (randomizing the order so the network doesn't memorize the sequence), and Multiprocessing 
+(using num_workers to have your CPU load the next batch from the hard drive while the GPU is busy doing math on the 
+current batch, preventing massive bottleneck delays)
+
+
+
+6. Verification, Visualization & Unit Tests (Cells 2-F to 2-I)
+
+----------------------------------------------------------------------------------------
+MAJOR MODEL PIPELINE 
+----------------------------------------------------------------------------------------

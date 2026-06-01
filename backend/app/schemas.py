@@ -64,6 +64,7 @@ class PatientRecordUpdate(BaseModel):
 
     patient_name: Optional[str] = None
     doctor_notes: Optional[str] = None
+    age: Optional[int] = None
 
 
 class PatientRecordOut(BaseModel):
